@@ -177,9 +177,13 @@ export const movieListStyles = StyleSheet.create({
         alignItems: 'center',
         padding: 5
     },
+    noResultsText:{
+        color:'white'
+    },
     noResultsWrapper: {
         alignItems: 'center',
-        padding: 5
+        padding: 5,
+        marginTop:10
     },
     listContainer: {
         justifyContent: 'space-evenly',
