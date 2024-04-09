@@ -1,230 +1,119 @@
-import React, { useState, useEffect } from 'react';
+// Imports necessary React components and hooks, React Native components, Redux hooks, and other utilities
+import React,{ useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, useWindowDimensions, StatusBar, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import type { NativeScrollEvent } from 'react-native';
-import { fetchMovieDetails } from '../actions/movieActions';
-import { AppState } from '../reducers';
-import { Props } from '../types';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
-import { useSharedValue } from 'react-native-reanimated';
-import { HeaderBar } from './HeaderBar';
-import { AntDesign } from '@expo/vector-icons';
-const dayjs = require('dayjs');
+import type{ NativeScrollEvent } from 'react-native';
+import { fetchMovieDetails } from '../actions/movieActions'; // Importing the action to fetch movie details
+import { AppState } from '../reducers'; // Importing the type for the app's state
+import { Props } from '../types'; // Props type definition
+import { TabbedHeaderPager } from 'react-native-sticky-parallax-header'; // Component for a sticky parallax header
+import { useSharedValue } from 'react-native-reanimated'; // Reanimated hook for shared values across components
+import { HeaderBar } from './HeaderBar'; // Custom header bar component
+import { AntDesign } from '@expo/vector-icons'; // Icon library
+import { movieDetailsStyles } from '../styles' // Style sheet for movie details
+const dayjs = require('dayjs'); // Library for date manipulation
 
-const MovieDetails: React.FC<Props> = ({ route, navigation }) => {
-    const { movieId } = route.params;
-    const dispatch = useDispatch();
-    const movie = useSelector((state: AppState) => state.movies.movieDetail);
-    const loading = useSelector((state: AppState) => state.movies.movieDetailLoading);
-    const offline = useSelector((state: AppState) => state.movies.offline);
-    const error = useSelector((state: AppState) => state.movies.error);
+// Component definition using functional component style
+const MovieDetails: React.FC<Props> = ({ route, navigation }) =>{
+    const{ movieId } = route.params; // Destructuring to extract movieId from navigation route
+    const dispatch = useDispatch(); // Hook to dispatch actions
+    const movie = useSelector((state: AppState) => state.movies.movieDetail); // Retrieves movie details from the Redux store
+    const loading = useSelector((state: AppState) => state.movies.movieDetailLoading); // Retrieves loading state
+    const offline = useSelector((state: AppState) => state.movies.offline); // Retrieves offline state
+    const error = useSelector((state: AppState) => state.movies.error); // Retrieves any error information
 
-    const { height: windowHeight } = useWindowDimensions();
-    const scrollValue = useSharedValue(0);
+    const{ height: windowHeight } = useWindowDimensions(); // Hook to get window dimensions
+    const scrollValue = useSharedValue(0); // Shared value for scroll position
 
-    function onScroll(e: NativeScrollEvent) {
-        'worklet';
-        scrollValue.value = e.contentOffset.y;
+    // Function to handle scroll events
+    function onScroll(e: NativeScrollEvent){
+        'worklet'; // Directive for the reanimated library to treat this as an animation worklet
+        scrollValue.value = e.contentOffset.y; // Updates the scrollValue based on current scroll position
     }
 
-    useEffect(() => {
+    // useEffect hook to dispatch the fetchMovieDetails action when component mounts or movieId changes
+    useEffect(() =>{
         dispatch(fetchMovieDetails(movieId));
     }, [dispatch, movieId]);
 
-    if (!movie || loading) {
+    // Conditional rendering based on the loading, offline, and error states
+    if (!movie || loading){
         return (
             <>
-                {offline && !error &&
-                    <View style={styles.offlineBaner}>
-                        <Text style={styles.offlineText}>
+              {/* Check if offline mode is true and there is no error, then show offline message */}
+              {offline && !error &&
+                    <View style={movieDetailsStyles.offlineBanner}>
+                        <Text style={movieDetailsStyles.offlineText}>
                             No internet connection
                         </Text>
-                    </View>}
-                {error &&
-                    <View style={styles.offlineBaner}>
-                        <Text style={styles.offlineText}>
-                            {error}
+                    </View>
+                }
+              {/* If there is an error, display it in a similar style banner */}
+              {error &&
+                    <View style={movieDetailsStyles.offlineBanner}>
+                        <Text style={movieDetailsStyles.offlineText}>
+                          {error}{/* Displaying the error message from the Redux store */}
                         </Text>
-                    </View>}
-                {loading &&
-                    <View style={styles.container}>
-                        <View style={styles.loadingWrapper}>
-                            <Text style={styles.loadingText}>Loading movie details...</Text>
-                        </View>
-                    </View>}</>
-        );
-    }
-
-    return (
-        <>
-            <TabbedHeaderPager
-                containerStyle={styles.stretchContainer}
-                backgroundImage={{
-                    uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                }}
-                title={movie.title}
-                titleStyle={styles.titleStyle}
-                onScroll={onScroll}
-                // parallaxHeight={20}
-                renderHeaderBar={() => <HeaderBar scrollValue={scrollValue} title={movie.title} />}
-                showsVerticalScrollIndicator={false}>
-                <View style={[styles.container, { height: windowHeight }]}>
-                    <View style={styles.topInfoWrapper}>
-                        <View style={styles.infoWrapper}>
-                            <AntDesign name="staro" size={20} color="white" />
-                            <Text style={styles.info}>{movie.vote_average?.toFixed(1)}</Text>
-                        </View>
-                        <View style={styles.infoWrapper}>
-                            <AntDesign name="clockcircleo" size={20} color="white" />
-                            <Text style={styles.info}>{dayjs(movie.release_date).format('DD MMMM YYYY')}</Text>
+                    </View>
+                }
+              {/* While the data is loading, show a loading indicator */}
+              {loading &&
+                    <View style={movieDetailsStyles.container}>
+                        <View style={movieDetailsStyles.loadingWrapper}>
+                            <Text style={movieDetailsStyles.loadingText}>Loading movie details...</Text>
                         </View>
                     </View>
-                    <View style={styles.genreWrapper}>
-                    {movie.genres && movie.genres.map(genre => (
-                        <View key={genre.id} style={styles.genreInfoWrapper}>
-                        <Text style={styles.genre}>{genre.name}</Text>
+                }
+            </>
+        );
+    }
+    
+
+    // Main component rendering
+    return (
+        <>
+          {/* TabbedHeaderPager provides a parallax header effect for the content */}
+            <TabbedHeaderPager
+                containerStyle={movieDetailsStyles.stretchContainer} // Style for the container, allows full stretch
+                backgroundImage={{ // Background image for the header set dynamically using movie poster
+                    uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                }}
+                title={movie.title} // Movie title displayed in the header
+                titleStyle={movieDetailsStyles.titleStyle} // Styling for the title
+                onScroll={onScroll} // Function to handle scroll events, updating scrollValue
+                renderHeaderBar={() => <HeaderBar scrollValue={scrollValue} title={movie.title} back={true} />}
+                showsVerticalScrollIndicator={false}>{/* Disables vertical scroll indicator */}
+              {/* Main view container that adjusts based on the window's height */}
+                <View style={[movieDetailsStyles.container,{ height: windowHeight }]}>
+                  {/* Container for top movie information (rating and release date) */}
+                    <View style={movieDetailsStyles.topInfoWrapper}>
+                      {/* Individual wrapper for rating info */}
+                        <View style={movieDetailsStyles.infoWrapper}>
+                            <AntDesign name="staro" size={20} color="white" />{/* Star icon */}
+                            <Text style={movieDetailsStyles.info}>{movie.vote_average?.toFixed(1)}</Text>{/* Movie rating, formatted to 1 decimal place */}
+                        </View>
+                      {/* Individual wrapper for release date info */}
+                        <View style={movieDetailsStyles.infoWrapper}>
+                            <AntDesign name="clockcircleo" size={20} color="white" />{/* Clock icon */}
+                            <Text style={movieDetailsStyles.info}>{dayjs(movie.release_date).format('DD MMMM YYYY')}</Text>{/* Formatted release date */}
+                        </View>
+                    </View>
+                  {/* Genre container, dynamically populated based on available genres */}
+                    <View style={movieDetailsStyles.genreWrapper}>
+                  {movie.genres && movie.genres.map(genre => (
+                        <View key={genre.id} style={movieDetailsStyles.genreInfoWrapper}>
+                        <Text style={movieDetailsStyles.genre}>{genre.name}</Text>{/* Genre name */}
                         </View>
                     ))}
                     </View>
-                    <View style={styles.overviewWrapper}>
-                        <Text style={styles.overview}>{movie.overview}</Text>
+                  {/* Overview text wrapper */}
+                    <View style={movieDetailsStyles.overviewWrapper}>
+                        <Text style={movieDetailsStyles.overview}>{movie.overview}</Text>{/* Movie overview/description */}
                     </View>
-
                 </View>
             </TabbedHeaderPager>
         </>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#181a21'
-    },
-    loadingWrapper: {
-        alignItems: 'center',
-        padding: 5
-    },
-    loadingText: {
-        color: 'white'
-    },
-    offlineBaner: {
-        backgroundColor: 'red',
-        alignItems: 'center',
-        padding: 5
-    },
-    offlineText: {
-        color: 'white',
-        fontWeight: 'bold'
-    },
-    image: {
-        width: '100%',
-        height: 300,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginTop: 10,
-    },
-    overviewWrapper: {
-        backgroundColor: '#1c1e27',
-        padding: 5,
-        paddingLeft: 15,
-        paddingRight: 15,
-        borderRadius: 10,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.20,
-        shadowRadius: 1.41,
-
-        elevation: 2,
-    },
-    overview: {
-        fontSize: 16,
-        color: 'white',
-    },
-    topInfoWrapper: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    infoWrapper: {
-        flexDirection: 'row',
-        justifyContent:'center',
-        alignItems:'center',
-        padding: 10,
-        marginBottom: 10,
-        backgroundColor: '#1c1e27',
-        borderRadius: 10,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.20,
-        shadowRadius: 1.41,
-
-        elevation: 2,
-    },
-    info: {
-        fontSize: 16,
-        color: 'white',
-        marginLeft: 10
-    },
-    genreInfoWrapper:{
-        backgroundColor: '#1c1e27',
-        margin:10,
-        marginTop:0,
-        marginLeft:0,
-        padding:10,
-        borderRadius:10,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.20,
-        shadowRadius: 1.41,
-
-        elevation: 2,
-    },
-    genreWrapper:{
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-    },
-    genre: {
-        fontSize: 14,
-        color: 'white',
-    },
-    headerImage: {
-        width: 20,
-        height: 20,
-    },
-    stretchContainer: {
-        alignSelf: 'stretch',
-        flex: 1,
-    },
-    titleStyle: {
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        color: "white",
-        fontSize: 40,
-        padding: 10,
-    },
-    contentContainer: {
-        backgroundColor: "white",
-        padding: 10,
-    },
-    contentText: {
-        fontSize: 16,
-    },
-    headerText: {
-        color: "white",
-        fontSize: 20,
-        paddingLeft: 20,
-    },
-});
 
 export default MovieDetails;
