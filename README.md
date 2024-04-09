@@ -1,2 +1,0 @@
-# MoviesApp
- Simple MoviesApp 
