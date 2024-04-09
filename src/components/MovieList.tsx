@@ -143,6 +143,9 @@ const MovieList: React.FC = () =>{
                                                     <View style={movieListStyles.infoContainer}>{/*  Displays the title of the movie */}
                                                         <Text style={movieListStyles.title}>{item.title}</Text>
                                                     </View>
+                                                    <View style={movieListStyles.infoWrapper}>
+                                                    <Text style={movieListStyles.info}>{item.vote_average?.toFixed(1)}</Text>{/* Movie rating, formatted to 1 decimal place */}
+                                                </View>
                                                 </TouchableOpacity>
                                             )}
                                         />
