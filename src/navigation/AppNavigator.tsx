@@ -11,7 +11,7 @@ const AppNavigator: React.FC = () => {
         <NavigationContainer>
             <Stack.Navigator initialRouteName="MovieList">
                 <Stack.Screen name="MovieList" component={MovieList} options={{ title: 'Top Movies' }} />
-                <Stack.Screen name="MovieDetails" component={MovieDetails} options={{ title: 'Movie Details' }} />
+                <Stack.Screen name="MovieDetails" component={MovieDetails} options={{ title: 'Movie Details', headerShown: false  }} />
             </Stack.Navigator>
         </NavigationContainer>
     );

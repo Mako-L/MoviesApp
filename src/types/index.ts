@@ -120,4 +120,13 @@ interface UpdateOfflineAction {
     payload: boolean;
 }
 
+export interface Props {
+    route: {
+        params: {
+            movieId: number;
+        }
+    },
+    navigation:any
+}
+
 export type MovieActionTypes = FetchTopMoviesSuccessAction | FetchTopMoviesFailureAction | FetchMovieDetailsSuccessAction | FetchMovieDetailsFailureAction | UpdateNumberOfItemsAction | UpdateMoviesLoadingAction | UpdateMovieDetailLoadingAction | UpdatePageAction | UpdateOfflineAction;

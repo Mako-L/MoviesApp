@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Dimensions } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTopMovies, updatePage, searchMovies } from '../actions/movieActions';
 import { useDebounce } from 'use-debounce';
@@ -7,6 +7,8 @@ import { Movie } from '../types';
 import { useNavigation } from '@react-navigation/native';
 import { AppState } from "../reducers";
 import Pagination from './Pagination';
+
+const { width } = Dimensions.get('window');
 
 const MovieList: React.FC = () => {
     const dispatch = useDispatch();
@@ -19,17 +21,29 @@ const MovieList: React.FC = () => {
     const page = useSelector((state: AppState) => state.movies.page);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchString] = useDebounce(searchQuery, 1000);
+
+
     useEffect(() => {
-        if (searchString === "") {
+        if (searchString.trim() === "") {
             dispatch(fetchTopMovies(page));
         } else {
             dispatch(searchMovies(searchString, page));
         }
-    }, [dispatch, page, searchString])
+    }, [page, dispatch]);
 
-    const handleSearchChange = (text: string) => {
-        setSearchQuery(text);
+    useEffect(() => {
+        if (searchString.trim() === "") {
+            dispatch(fetchTopMovies(1));
+        } else {
+            dispatch(searchMovies(searchString, 1));
+        }
+        dispatch(updatePage(1));
+    }, [searchString, dispatch]);
+
+    const handleSearchChange = (newSearchString) => {
+        setSearchQuery(newSearchString);
     };
+
 
     return (
         <>
@@ -63,23 +77,26 @@ const MovieList: React.FC = () => {
                                 data={movies}
                                 keyExtractor={(item) => item.id.toString()}
                                 scrollEnabled={false}
+                                numColumns={2}
+                                contentContainerStyle={styles.listContainer}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity
                                         activeOpacity={1}
                                         style={styles.movieItem}
                                         onPress={() => {
-                                            if(!offline){
-                                            navigation.navigate('MovieDetails', { movieId: item.id })
+                                            if (!offline) {
+                                                navigation.navigate('MovieDetails', { movieId: item.id })
                                             }
                                         }}
                                     >
-                                        <Image
-                                            style={styles.image}
-                                            source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
-                                        />
+                                        <View style={styles.imageWrapper}>
+                                            <Image
+                                                style={styles.image}
+                                                source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
+                                            />
+                                        </View>
                                         <View style={styles.infoContainer}>
                                             <Text style={styles.title}>{item.title}</Text>
-                                            <Text numberOfLines={3} style={styles.overview}>{item.overview}</Text>
                                         </View>
                                     </TouchableOpacity>
                                 )}
@@ -94,7 +111,7 @@ const MovieList: React.FC = () => {
                                     }}
                                     pagesPerBatch={2}
                                 />
-                            </View>: <View style={styles.paginationWrapper}></View>}
+                            </View> : <View style={styles.paginationWrapper}></View>}
                     </>}
             </ScrollView>
         </>
@@ -114,6 +131,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 5
     },
+    listContainer: {
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        padding: 10
+    },
     offlineBaner: {
         backgroundColor: 'red',
         alignItems: 'center',
@@ -132,10 +154,33 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     movieItem: {
-        flexDirection: 'row',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: (width / 2) - 20,
         padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
+        backgroundColor: 'white',
+        margin: 5,
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.20,
+        shadowRadius: 1.41,
+
+        elevation: 2,
+    },
+    imageWrapper: {
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.20,
+        shadowRadius: 1.41,
+
+        elevation: 2,
     },
     image: {
         width: 100,
@@ -149,11 +194,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: 'bold',
+        textAlign: 'center'
     },
     overview: {
         fontSize: 14,
         color: 'gray',
-    }, paginationWrapper: {
+    },
+    paginationWrapper: {
         marginTop: 10,
         marginBottom: 30
     }
