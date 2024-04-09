@@ -1,5 +1,8 @@
-import { StyleSheet,Dimensions } from 'react-native';
+import { StyleSheet,Dimensions, StatusBar, Platform  } from 'react-native';
 const { width } = Dimensions.get('window');
+
+// Get the status bar height based on the platform
+const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 20;
 
 // parallax header styles
 export const headerStyles = StyleSheet.create({
@@ -47,7 +50,7 @@ export const movieDetailsStyles = StyleSheet.create({
         backgroundColor: 'red',
         alignItems: 'center',
         padding: 5,
-        marginTop:25
+        marginTop:statusBarHeight
     },
     offlineText: {
         color: 'white',
