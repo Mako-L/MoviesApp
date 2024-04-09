@@ -1,6 +1,6 @@
 # MoviesApp
 
-MoviesApp is a React Native application that leverages the Movie Database API (TheMovieDB) to deliver a seamless and interactive experience for movie enthusiasts. Users can search for movies, view the top films, and get details on individual films. The app is designed to function both online and offline, retaining the top 10 movies data for access without an internet connection.
+MoviesApp is a React Native application that leverages the Movie Database API (TheMovieDB) to deliver a seamless and interactive experience for movie enthusiasts. Users can search for movies, view the top films, and get details on individual films. The app is designed to function both online and offline, retaining the top 20 movies data for access without an internet connection.
 
 ## Features
 
