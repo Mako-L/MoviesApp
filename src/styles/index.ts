@@ -46,7 +46,8 @@ export const movieDetailsStyles = StyleSheet.create({
     offlineBanner: {
         backgroundColor: 'red',
         alignItems: 'center',
-        padding: 5
+        padding: 5,
+        marginTop:25
     },
     offlineText: {
         color: 'white',
