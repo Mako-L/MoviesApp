@@ -1,17 +1,19 @@
 // Import necessary modules from React and React Native, including hooks and components
 import React,{ useEffect, useState } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, useWindowDimensions, Image } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, useWindowDimensions, Image,ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux'; // Hooks for Redux to dispatch actions and select from the state
 import { fetchTopMovies, updatePage, searchMovies } from '../actions/movieActions'; // Action creators for fetching movies and updating pagination
 import { useDebounce } from 'use-debounce'; // Hook for debouncing rapid changes to inputs
 import type{ NativeScrollEvent } from 'react-native'; // TypeScript type for scroll events
 import { useNavigation } from '@react-navigation/native'; // Hook for navigation
 import { AppState } from "../reducers"; // Type definition for the Redux store state
-import Pagination from './Pagination'; // Custom component for pagination
+import Pagination from '../components/Pagination'; // Custom component for pagination
 import { TabbedHeaderPager } from 'react-native-sticky-parallax-header'; // Component for a sticky parallax header
 import { useSharedValue } from 'react-native-reanimated'; // Reanimated hook for shared animation values
-import { HeaderBar } from './HeaderBar'; // Custom header bar component
+import { HeaderBar } from '../components/HeaderBar'; // Custom header bar component
 import { movieListStyles } from '../styles' // Import styles specifically for this component
+import { useNetworkStatus } from '../hooks' // Custom hook to check network status
+import { AntDesign } from '@expo/vector-icons'; // Icon library
 
 // Functional component definition
 const MovieList: React.FC = () =>{
@@ -31,6 +33,8 @@ const MovieList: React.FC = () =>{
     const [searchQuery, setSearchQuery] = useState('');
     const [searchString] = useDebounce(searchQuery, 1000); // Debounces the search input to reduce API calls
 
+    const isConnected = useNetworkStatus(); // Check if device has an active internet connection
+
     // Window dimensions and scroll position management for animated effects
     const{ height: windowHeight } = useWindowDimensions();
     const scrollValue = useSharedValue(0);
@@ -40,6 +44,17 @@ const MovieList: React.FC = () =>{
         'worklet';
         scrollValue.value = e.contentOffset.y;
     }
+
+    // Effect for fetching movies if we wore disconnected from the internet and we connected back again
+    useEffect(() =>{
+        if((error && isConnected) || (offline && isConnected)){
+        if (searchString.trim() === ""){
+            dispatch(fetchTopMovies(page));
+        } else{
+            dispatch(searchMovies(searchString, page));
+        }
+        }
+    }, [isConnected]);
 
     // Effect for fetching movies based on search query or page change
     useEffect(() =>{
@@ -81,7 +96,7 @@ const MovieList: React.FC = () =>{
             >
                 <>
                    {/* Offline and error handling banners */}
-                   {offline && !error &&
+                   {!isConnected && !error &&
                         <View style={movieListStyles.offlineBanner}>
                             <Text style={movieListStyles.offlineText}>
                                 No internet connection
@@ -98,6 +113,7 @@ const MovieList: React.FC = () =>{
                     <View style={movieListStyles.container}>
                        {/* Search input */}
                         <View style={movieListStyles.searchWrapper}>
+                            <AntDesign name="search1" size={20} color="white" />{/* Search icon */}
                             <TextInput
                                 style={movieListStyles.searchInput}
                                 placeholder="Search movies..."
@@ -108,11 +124,14 @@ const MovieList: React.FC = () =>{
                         </View>
                        {/* Conditional rendering based on loading state and search results */}
                        {loading ?
-                            <View style={movieListStyles.loadingWrapper}><Text style={movieListStyles.loadingText}>Loading...</Text></View>
+                            <View style={movieListStyles.loadingWrapper}>
+                                <ActivityIndicator color="red"/>
+                                <Text style={movieListStyles.loadingText}>Loading...</Text>
+                                </View>
                             :
                             <>
                                {movies.length === 0 && !loading ?
-                                    <View style={movieListStyles.noResultsWrapper}><Text>No results</Text></View>
+                                    <View style={movieListStyles.noResultsWrapper}><Text style={movieListStyles.noResultsText}>No results</Text></View>
                                     :
                                     <>
                                        {/* FlatList component to render a list of movies */}
@@ -127,7 +146,7 @@ const MovieList: React.FC = () =>{
                                                     activeOpacity={1}  // Sets the opacity to 1 when the item is pressed, indicating no visual feedback on press
                                                     style={movieListStyles.movieItem}  // Styles for each movie item
                                                     onPress={() =>{  // Defines what happens when a movie item is pressed
-                                                        if (!offline){  // Checks if the app is not offline
+                                                        if (isConnected){  // Checks if the app is connected
                                                             navigation.navigate('MovieDetails',{ movieId: item.id })  // Navigates to the MovieDetails screen with the movieId as a parameter
                                                         }
                                                     }}
@@ -152,7 +171,7 @@ const MovieList: React.FC = () =>{
                                     </>}
 
                                {/* Pagination component for navigating between pages */}
-                               {totalItems !== 0 ?
+                               {totalItems !== 0 && isConnected ?
                                     <View style={movieListStyles.paginationWrapper}>
                                         <Pagination
                                             currPage={page}

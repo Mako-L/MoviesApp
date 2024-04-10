@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated,{ Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated'; // Importing animated components and functions
 import { SafeAreaView } from 'react-native-safe-area-context'; // Safe area handler
-import { AntDesign } from '@expo/vector-icons'; // Icon component
+import { AntDesign,MaterialCommunityIcons } from '@expo/vector-icons'; // Icon components
 import { headerStyles } from '../styles' // Import custom styles
 
 // TypeScript interface defining the props expected by the HeaderBar component
@@ -34,12 +34,17 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ scrollValue, title, back }
         // Safe area view to handle insets properly on different devices
         <SafeAreaView edges={['top', 'left', 'right']} style={headerStyles.headerContainer}>
            {/* View container for the header content */}
-            <View style={headerStyles.headerWrapper}>
+            <View style={headerStyles.headerWrapper}>            
                {/* Conditional rendering of the back button if the 'back' prop is true */}
-               {back &&
+               {back ?
                 <TouchableOpacity onPress={goBack}>{/* Touchable area for back button */}
                     <AntDesign name="arrowleft" size={20} color="white" />{/* Back arrow icon */}
-                </TouchableOpacity>}
+                </TouchableOpacity>: <>
+                {/* Movies icon button */}
+                <Animated.View style={animatedStyle}>
+                <MaterialCommunityIcons name="movie-open-star-outline" size={24} color="white" />
+                </Animated.View>
+                </>}
                {/* Animated view for the title that fades in based on scroll position */}
                 <Animated.View style={animatedStyle}>
                     <Text style={headerStyles.headerText}>

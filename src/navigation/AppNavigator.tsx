@@ -2,8 +2,8 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native'; // Component that manages the navigation tree and contains the navigation state
 import { createStackNavigator } from '@react-navigation/stack'; // Function to create a stack navigator
-import MovieList from '../components/MovieList'; // Component for listing movies
-import MovieDetails from '../components/MovieDetails'; // Component for displaying movie details
+import MovieList from '../screens/MovieList'; // Component for listing movies
+import MovieDetails from '../screens/MovieDetails'; // Component for displaying movie details
 
 const Stack = createStackNavigator(); // Create a stack navigator object
 

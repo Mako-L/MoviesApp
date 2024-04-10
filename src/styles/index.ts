@@ -1,5 +1,5 @@
 import { StyleSheet,Dimensions, StatusBar, Platform  } from 'react-native';
-const { width } = Dimensions.get('window');
+const { width,height} = Dimensions.get('window');
 
 // Get the status bar height based on the platform
 const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 20;
@@ -39,12 +39,15 @@ export const movieDetailsStyles = StyleSheet.create({
         backgroundColor: '#181a21'
     },
     loadingWrapper: {
+        flexDirection:'row',
+        justifyContent:'center',
         alignItems: 'center',
         padding: 5,
-        marginTop:20
+        marginTop: statusBarHeight
     },
     loadingText: {
-        color: 'white'
+        color: 'white',
+        marginLeft:10
     },
     offlineBanner: {
         backgroundColor: 'red',
@@ -143,7 +146,7 @@ export const movieDetailsStyles = StyleSheet.create({
         flex: 1,
     },
     titleStyle: {
-        backgroundColor: 'rgba(0,0,0,0.3)',
+        backgroundColor: 'rgba(0,0,0,0.6)',
         color: "white",
         fontSize: 40,
         padding: 10,
@@ -171,19 +174,26 @@ export const movieListStyles = StyleSheet.create({
         backgroundColor: '#181a21'
     },
     loadingText:{
-        color:'white'
+        color:'white',
+        marginLeft: 10
     },
     loadingWrapper: {
+        flexDirection:'row',
+        justifyContent:'center',
         alignItems: 'center',
-        padding: 5
+        padding: 5,
+        marginTop:10,
+        paddingBottom:height-(height/100*21)
     },
     noResultsText:{
-        color:'white'
+        color:'white',
+        fontWeight: 'bold'
     },
     noResultsWrapper: {
         alignItems: 'center',
         padding: 5,
-        marginTop:10
+        marginTop:10,
+        paddingBottom:height-(height/100*21)
     },
     listContainer: {
         justifyContent: 'space-evenly',
@@ -200,6 +210,8 @@ export const movieListStyles = StyleSheet.create({
         fontWeight: 'bold'
     },
     searchWrapper:{
+        flexDirection:'row',
+        alignItems:'center',
         borderRadius: 25,
         paddingLeft:15,
         backgroundColor: '#1c1e27',
@@ -222,7 +234,7 @@ export const movieListStyles = StyleSheet.create({
     infoWrapper: {
         position:'absolute',
         top:3,
-        right:5,
+        right:3,
         flexDirection: 'row',
         justifyContent:'center',
         alignItems:'center',
@@ -262,6 +274,10 @@ export const movieListStyles = StyleSheet.create({
         elevation: 2,
     },
     imageWrapper: {
+        flex:1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',  
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -271,10 +287,12 @@ export const movieListStyles = StyleSheet.create({
         shadowRadius: 1.41,
 
         elevation: 2,
+        
     },
     image: {
-        width: 100,
-        height: 150,
+        width:'100%',
+        maxWidth: 150,
+        height: 180,
         borderRadius: 5,
     },
     infoContainer: {

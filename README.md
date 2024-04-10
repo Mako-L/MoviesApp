@@ -7,7 +7,7 @@ MoviesApp is a React Native application that leverages the Movie Database API (T
 - **Search**: Users can search for movies within the TheMovieDB database.
 - **Top Movies**: Display the top-rated movies on the Home Page.
 - **Movie Details**: Users can view detailed information about the films but only when internet connection is available.
-- **Offline Support**: The app retains functionality even without an internet connection, displaying the top 20 movies data.
+- **Offline Support**: The app retains some functionality even without an internet connection, displaying the first top 20 movies data.
 
 ## Tech Stack
 
@@ -29,14 +29,17 @@ src/
 |   |-- banner.jpg
 |-- components/
 |   |-- HeaderBar.tsx
-|   |-- MovieDetails.tsx
-|   |-- MovieList.tsx
 |   |-- Pagination.tsx
+|-- hooks/
+|   |-- index.tsx
 |-- navigation/
 |   |-- AppNavigator.tsx
 |-- reducers/
 |   |-- index.ts
 |   |-- MovieReducer.ts
+|-- screens/
+|   |-- MovieDetails.tsx
+|   |-- MovieList.tsx
 |-- store/
 |   |-- index.tsx
 |-- styles/
@@ -54,7 +57,7 @@ App.tsx
 3. Create a `.env` file in the root directory and add the following line:
 
 ```plaintext
-API_KEY=your_api_key_here
+EXPO_PUBLIC_API_KEY=your_api_key_here
 ```
 
 Replace `your_api_key_here` with your API key from TheMovieDB.
@@ -92,7 +95,7 @@ src/
 7. Managing network status checking using NetInfo to handle offline scenarios and inform the user accordingly.
 8. Each action creator handles the loading state, success, and failure scenarios, dispatching appropriate actions to the Redux store for each case.
 
-The API key is retrieved from the environment variable `API_KEY` and is used to authorize requests to the TheMovieDB API.
+The API key is retrieved from the environment variable `EXPO_PUBLIC_API_KEY` and is used to authorize requests to the TheMovieDB API.
 
 ```plaintext
 src/
@@ -109,7 +112,7 @@ The `HeaderBar.tsx` component is a custom, animated header for the app's screens
 
 ```plaintext
 src/
-|-- components/
+|-- screens/
 |   |-- MovieDetails.tsx
 ```
 In the `MovieDetails.tsx` component, I set up a screen to show detailed information about a movie. Here's what it does:
@@ -123,7 +126,7 @@ In the `MovieDetails.tsx` component, I set up a screen to show detailed informat
 
 ```plaintext
 src/
-|-- components/
+|-- screens/
 |   |-- MovieList.tsx
 ```
 The `MovieList.tsx` file defines a component for displaying a searchable and paginated list of movies:
@@ -131,6 +134,7 @@ The `MovieList.tsx` file defines a component for displaying a searchable and pag
 - It integrates with Redux to fetch top movies and handle search functionality.
 - Uses a debounced search input to minimize API calls while typing.
 - Manages movie data, loading states, and pagination within the component's state.
+- Uses a custom hook, `useNetworkStatus`, to monitor and react to changes in network connectivity. This allows the component to respond dynamically, such as refetching data when the network becomes available after a disconnect.
 - Implements a custom `Pagination` component and a `FlatList` to display movies in a grid.
 - Each movie item is clickable, leading to detailed information if not in offline mode.
 - Handles offline notices and errors, displaying banners when no internet connection is available or when an error occurs.
@@ -155,6 +159,19 @@ The `Pagination.tsx` file is a component that provides pagination functionality:
 - It uses `React.memo` to optimize performance by preventing unnecessary re-renders unless its props change.
 
 This component enhances user experience by providing an intuitive and responsive way to navigate through a list of items, such as a movie list.
+
+```plaintext
+src/
+|-- hooks/
+|   |-- index.tsx
+```
+The `index.tsx` from `hooks` folder contains `useNetworkStatus` custom hook that monitors network connectivity in a React Native app.
+
+1. **Imports and Setup**: The hook imports React's `useState` and `useEffect` for state management and lifecycle effects, and uses `NetInfo` from `@react-native-community/netinfo` to check network status.
+2. **State Management**: It initializes a `isConnected` state variable with `null` to indicate that the initial network status is not checked yet.
+3. **Listener Setup**: Inside `useEffect`, it subscribes to network changes and updates `isConnected` whenever the network status changes.
+4. **Cleanup**: It also ensures the subscription is cleaned up to prevent memory leaks when the component unmounts.
+5. **Output**: The hook returns the current network status, letting components react to changes in network connectivity.
 
 ```plaintext
 src/
@@ -196,6 +213,18 @@ The `MovieReducer.ts` file in your project defines a Redux reducer that manages 
 
 `.env` file is used to securely manage configuration values that shouldn't be hardcoded into the application's source code.
 
-I placed the API key for TheMovieDB API in the `.env` file as `API_KEY=your_actual_api_key_here`. This key is crucial for making authenticated requests to TheMovieDB's services to fetch movie data.
+I placed the API key for TheMovieDB API in the `.env` file as `EXPO_PUBLIC_API_KEY=your_actual_api_key_here`. This key is crucial for making authenticated requests to TheMovieDB's services to fetch movie data.
 
 By keeping the `.env` file in the root directory and referencing it in our code, we effectively manage sensitive configuration in a secure and maintainable way.
+
+## Note
+When Building the apk with the command `eas build -p android --profile preview` make sure the `eas.json` file has the env parameter set as this:
+
+```plaintext
+   "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_KEY": "your_actual_api_key_here"
+      }
+    },
+```

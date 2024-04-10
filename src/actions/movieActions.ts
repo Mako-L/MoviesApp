@@ -10,7 +10,7 @@ import {
     UPDATE_PAGE, UPDATE_OFFLINE 
 } from '../types'; // Import action types and interfaces
 
-const API_KEY = `${process.env.API_KEY}`; // Retrieve API key from environment variables
+const API_KEY = `${process.env.EXPO_PUBLIC_API_KEY}`; // Retrieve API key from environment variables
 
 // Action creator to update the current page number in the store
 export const updatePage = (page: number) => (dispatch: Dispatch<MovieActionTypes>) => {
@@ -35,6 +35,7 @@ export const fetchTopMovies = (page: number) => async (dispatch: Dispatch<MovieA
             dispatch({ type: FETCH_TOP_MOVIES_SUCCESS, payload: response.data.results }); // Dispatch success action with the movies data
             dispatch({ type: UPDATE_NUMBER_OF_ITEMS, payload: response.data.total_results }); // Update the total number of items
             dispatch({ type: UPDATE_MOVIES_LOADING, payload: false }); // Indicate that movies loading has finished
+            dispatch({ type: UPDATE_OFFLINE, payload: false }); // Indicate the app is Online
         } catch (error) {
             dispatch({ type: FETCH_TOP_MOVIES_FAILURE, payload: 'Failed to fetch movies' }); // Dispatch failure action if request fails
             dispatch({ type: UPDATE_MOVIES_LOADING, payload: false }); // Indicate that movies loading has finished
@@ -65,6 +66,7 @@ export const fetchMovieDetails = (movieId: number) => async (dispatch: Dispatch<
             headers: { Authorization: `Bearer ${API_KEY}` } // Use API key for authorization
         });
         dispatch({ type: FETCH_MOVIE_DETAILS_SUCCESS, payload: response.data }); // Dispatch success action with the movie details
+        dispatch({ type: UPDATE_OFFLINE, payload: false }); // Indicate the app is Online
     } catch (error) {
         dispatch({ type: FETCH_MOVIE_DETAILS_FAILURE, payload: 'Failed to fetch movie details' }); // Dispatch failure action if request fails
     } finally {
@@ -89,6 +91,7 @@ export const searchMovies = (query: string, page: number) => async (dispatch: Di
 
             dispatch({ type: FETCH_TOP_MOVIES_SUCCESS, payload: response.data.results }); // Dispatch success action with the search results
             dispatch({ type: UPDATE_NUMBER_OF_ITEMS, payload: response.data.total_results }); // Update the total number of items
+            dispatch({ type: UPDATE_OFFLINE, payload: false }); // Indicate the app is Online
         }
     } catch (error) {
         dispatch({ type: FETCH_TOP_MOVIES_FAILURE, payload: 'Failed to fetch movies' }); // Dispatch failure action if request fails

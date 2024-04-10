@@ -1,6 +1,6 @@
 // Imports necessary React components and hooks, React Native components, Redux hooks, and other utilities
-import React,{ useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, useWindowDimensions, StatusBar, TouchableOpacity, SafeAreaView } from 'react-native';
+import React,{ useEffect } from 'react';
+import { View, Text, useWindowDimensions, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import type{ NativeScrollEvent } from 'react-native';
 import { fetchMovieDetails } from '../actions/movieActions'; // Importing the action to fetch movie details
@@ -8,7 +8,7 @@ import { AppState } from '../reducers'; // Importing the type for the app's stat
 import { Props } from '../types'; // Props type definition
 import { TabbedHeaderPager } from 'react-native-sticky-parallax-header'; // Component for a sticky parallax header
 import { useSharedValue } from 'react-native-reanimated'; // Reanimated hook for shared values across components
-import { HeaderBar } from './HeaderBar'; // Custom header bar component
+import { HeaderBar } from '../components/HeaderBar'; // Custom header bar component
 import { AntDesign } from '@expo/vector-icons'; // Icon library
 import { movieDetailsStyles } from '../styles' // Style sheet for movie details
 const dayjs = require('dayjs'); // Library for date manipulation
@@ -60,6 +60,7 @@ const MovieDetails: React.FC<Props> = ({ route, navigation }) =>{
               {loading &&
                     <View style={movieDetailsStyles.container}>
                         <View style={movieDetailsStyles.loadingWrapper}>
+                            <ActivityIndicator color="red"/>
                             <Text style={movieDetailsStyles.loadingText}>Loading movie details...</Text>
                         </View>
                     </View>

@@ -90,7 +90,7 @@ interface FetchTopMoviesSuccessAction {
 
 interface FetchTopMoviesFailureAction {
     type: typeof FETCH_TOP_MOVIES_FAILURE;
-    payload: string;  // Payload contains the error message
+    payload: string;  // Payload contains the error message 
 }
 
 interface FetchMovieDetailsSuccessAction {
@@ -100,7 +100,7 @@ interface FetchMovieDetailsSuccessAction {
 
 interface FetchMovieDetailsFailureAction {
     type: typeof FETCH_MOVIE_DETAILS_FAILURE;
-    payload: string;  // Payload contains the error message
+    payload: string;  // Payload contains the error message 
 }
 
 interface UpdateNumberOfItemsAction {
