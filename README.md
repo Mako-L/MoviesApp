@@ -71,7 +71,7 @@ npm start --reset-cache
 ## Documentation
 
 - All code is well-documented with comments to understand the functionality and usage.
-- For more detailed documentation, see the specific files within the `components/` and `actions/` directories.
+- For more detailed documentation, see the specific files within the `components/`, `screens/` and `actions/` directories.
 
 ## Notes
 
